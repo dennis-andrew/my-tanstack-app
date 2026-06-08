@@ -5,9 +5,6 @@ import { useFieldContext, useFormContext } from '#/hooks/demo.form-context'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { Textarea as ShadcnTextarea } from '#/components/ui/textarea'
-import * as ShadcnSelect from '#/components/ui/select'
-import { Slider as ShadcnSlider } from '#/components/ui/slider'
-import { Switch as ShadcnSwitch } from '#/components/ui/switch'
 import { Label } from '#/components/ui/label'
 
 export function SubscribeButton({ label }: { label: string }) {
@@ -109,29 +106,28 @@ export function Select({
 
   return (
     <div>
-      <ShadcnSelect.Select
+      <Label htmlFor={label} className="mb-2 text-xl font-bold">
+        {label}
+      </Label>
+      <select
+        id={label}
         name={field.name}
         value={field.state.value}
-        onValueChange={(value) => field.handleChange(value)}
+        onBlur={field.handleBlur}
+        onChange={(e) => field.handleChange(e.target.value)}
+        className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:text-sm"
       >
-        <ShadcnSelect.SelectTrigger className="w-full">
-          <ShadcnSelect.SelectValue placeholder={placeholder} />
-        </ShadcnSelect.SelectTrigger>
-        <ShadcnSelect.SelectContent className="bg-background text-foreground">
-          <ShadcnSelect.SelectGroup>
-            <ShadcnSelect.SelectLabel>{label}</ShadcnSelect.SelectLabel>
-            {values.map((value) => (
-              <ShadcnSelect.SelectItem
-                key={value.value}
-                value={value.value}
-                className="text-foreground"
-              >
-                {value.label}
-              </ShadcnSelect.SelectItem>
-            ))}
-          </ShadcnSelect.SelectGroup>
-        </ShadcnSelect.SelectContent>
-      </ShadcnSelect.Select>
+        {placeholder ? (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        ) : null}
+        {values.map((value) => (
+          <option key={value.value} value={value.value}>
+            {value.label}
+          </option>
+        ))}
+      </select>
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
   )
@@ -146,11 +142,14 @@ export function Slider({ label }: { label: string }) {
       <Label htmlFor={label} className="mb-2 text-xl font-bold">
         {label}
       </Label>
-      <ShadcnSlider
+      <Input
         id={label}
+        type="range"
+        min={0}
+        max={100}
         onBlur={field.handleBlur}
-        value={[field.state.value]}
-        onValueChange={(value) => field.handleChange(value[0])}
+        value={field.state.value}
+        onChange={(e) => field.handleChange(e.target.valueAsNumber)}
       />
       {field.state.meta.isTouched && <ErrorMessages errors={errors} />}
     </div>
@@ -164,11 +163,13 @@ export function Switch({ label }: { label: string }) {
   return (
     <div>
       <div className="flex items-center gap-2">
-        <ShadcnSwitch
+        <Input
           id={label}
+          type="checkbox"
+          className="h-5 w-5"
           onBlur={field.handleBlur}
           checked={field.state.value}
-          onCheckedChange={(checked) => field.handleChange(checked)}
+          onChange={(e) => field.handleChange(e.target.checked)}
         />
         <Label htmlFor={label}>{label}</Label>
       </div>

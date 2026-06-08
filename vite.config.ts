@@ -8,7 +8,6 @@ import tailwindcss from '@tailwindcss/vite'
 import neon from './neon-vite-plugin.ts'
 
 const config = defineConfig({
-  resolve: { tsconfigPaths: true },
   plugins: [devtools(), neon, tailwindcss(), tanstackStart(), viteReact()],
 })
 

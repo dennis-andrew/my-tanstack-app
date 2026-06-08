@@ -42,9 +42,19 @@ export const Route = createFileRoute('/demo/api/ai/chat')({
           const body = await request.json()
           const { messages } = body
 
-          // Determine the best available provider
-          let provider: string = 'ollama'
           let model: string = 'mistral:7b'
+
+          // Adapter factory pattern for multi-vendor support
+          const adapterConfig = {
+            anthropic: () =>
+              anthropicText((model || 'claude-haiku-4-5') as any),
+            openai: () => openaiText((model || 'gpt-4o') as any),
+            gemini: () => geminiText((model || 'gemini-2.0-flash-exp') as any),
+            ollama: () => ollamaText((model || 'mistral:7b') as any),
+          }
+
+          // Determine the best available provider
+          let provider: keyof typeof adapterConfig = 'ollama'
           if (process.env.ANTHROPIC_API_KEY) {
             provider = 'anthropic'
             model = 'claude-haiku-4-5'
@@ -54,15 +64,6 @@ export const Route = createFileRoute('/demo/api/ai/chat')({
           } else if (process.env.GEMINI_API_KEY) {
             provider = 'gemini'
             model = 'gemini-2.0-flash-exp'
-          }
-
-          // Adapter factory pattern for multi-vendor support
-          const adapterConfig = {
-            anthropic: () =>
-              anthropicText((model || 'claude-haiku-4-5') as any),
-            openai: () => openaiText((model || 'gpt-4o') as any),
-            gemini: () => geminiText((model || 'gemini-2.0-flash-exp') as any),
-            ollama: () => ollamaText((model || 'mistral:7b') as any),
           }
 
           const adapter = adapterConfig[provider]()
